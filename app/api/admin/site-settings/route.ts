@@ -23,9 +23,9 @@ export async function PUT(request: Request) {
     const data = await request.json();
     const validated = await siteSettingsSchema.parseAsync(data);
     
-    // Prevent logo from being used as hero image
+    // Prevent the default logo file from being used as the hero image
     let heroImage = validated.heroImage || "";
-    if (heroImage && heroImage.includes("flyover-logo")) {
+    if (heroImage && heroImage.endsWith("flyover-logo.jpg")) {
       heroImage = "";
     } else {
       try {

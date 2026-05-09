@@ -24,7 +24,7 @@ export default function SiteSettingsPage() {
             ...DEFAULT_SITE_SETTINGS,
             ...data,
             logoText: data.logoText || data.siteName || DEFAULT_SITE_SETTINGS.logoText,
-            heroImage: (data.heroImage && !data.heroImage.includes("flyover-logo")) ? data.heroImage : "",
+            heroImage: data.heroImage && !data.heroImage.endsWith("flyover-logo.jpg") ? data.heroImage : "",
           });
         }
       })

@@ -59,7 +59,11 @@ export async function getSiteSettings(): Promise<SiteSettingsValue> {
       heroEyebrow: settings.heroEyebrow,
       heroTitle: settings.heroTitle,
       heroSubtitle: settings.heroSubtitle,
-      heroImage: (settings.heroImage && !settings.heroImage.includes("flyover-logo")) ? settings.heroImage : "",
+      // Only ignore the default logo file; allow other uploaded images even if name contains 'flyover-logo' elsewhere
+      heroImage:
+        settings.heroImage && !settings.heroImage.endsWith("flyover-logo.jpg")
+          ? settings.heroImage
+          : "",
       heroPrimaryCtaLabel: settings.heroPrimaryCtaLabel,
       heroPrimaryCtaHref: settings.heroPrimaryCtaHref,
       heroSecondaryCtaLabel: settings.heroSecondaryCtaLabel,

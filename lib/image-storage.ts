@@ -2,9 +2,9 @@ import { randomUUID } from "crypto";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // Strict remote storage: require Supabase env vars
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SUPABASE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SUPABASE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET!;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_BUCKET) {
   throw new Error(
@@ -95,7 +95,7 @@ export async function persistImageReference(
     }
 
     const { data: publicUrlData } = supabaseAdmin.storage.from(SUPABASE_BUCKET).getPublicUrl(objectPath);
-    const publicUrl = publicUrlData?.publicUrl || publicUrlData?.public_url || null;
+    const publicUrl = publicUrlData?.publicUrl || null;
     if (!publicUrl) throw new Error("Failed to obtain public URL from Supabase storage.");
 
     return publicUrl;
