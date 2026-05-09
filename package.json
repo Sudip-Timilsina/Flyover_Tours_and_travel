@@ -47,5 +47,8 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
+  },
+  "prisma": {
+    "seed": "tsx -r dotenv/config ./prisma/seed.ts"
   }
 }
