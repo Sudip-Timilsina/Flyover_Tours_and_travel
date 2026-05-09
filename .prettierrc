@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
+  }
+}

@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model SiteSettings {
+  id                   String   @id @default("singleton")
+  siteName             String
+  siteDescription      String
+  siteUrl              String
+  contactEmail         String
+  contactPhone         String
+  address              String
+  logoText             String?
+  heroEyebrow          String
+  heroTitle            String
+  heroSubtitle         String   @db.Text
+  heroImage            String?
+  heroPrimaryCtaLabel   String
+  heroPrimaryCtaHref    String
+  heroSecondaryCtaLabel String
+  heroSecondaryCtaHref  String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model Tour {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  overview    String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  duration    Int      // in days
+  groupSize   String   // e.g., "4-12 people"
+  difficulty  String   // Easy, Moderate, Hard, Expert
+  category    String   // Trekking, Cultural, Adventure, etc.
+  bestSeason  String
+  image       String?  // Featured image URL
+  
+  inclusions  String[] // What's included
+  exclusions  String[] // What's excluded
+  
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+  
+  itineraries Itinerary[]
+  faqs        FAQ[]
+  images      TourImage[]
+  
+  seoTitle       String?
+  seoDescription String?
+  keywords       String?
+  
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tours")
+  @@index([slug])
+  @@index([destinationId])
+  @@index([category])
+}
+
+model Destination {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String   @db.Text
+  image       String?
+  
+  tours Tour[]
+  
+  seoTitle       String?
+  seoDescription String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("destinations")
+  @@index([slug])
+}
+
+model Itinerary {
+  id    String  @id @default(cuid())
+  day   Int
+  title String
+  description String @db.Text
+  activities String[]
+  accommodation String?
+  meals String? // e.g., "B, L, D"
+  
+  tourId String
+  tour   Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("itineraries")
+  @@index([tourId])
+}
+
+model FAQ {
+  id    String @id @default(cuid())
+  question String
+  answer   String @db.Text
+  
+  tourId String
+  tour   Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("faqs")
+  @@index([tourId])
+}
+
+model TourImage {
+  id    String @id @default(cuid())
+  url   String
+  alt   String?
+  order Int    @default(0)
+  
+  tourId String
+  tour   Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("tour_images")
+  @@index([tourId])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String
+  image       String?
+  author      String   @default("Admin")
+  
+  seoTitle       String?
+  seoDescription String?
+  keywords       String?
+  
+  published Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_posts")
+  @@index([slug])
+}
+
+model BookingInquiry {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  tourId      String?
+  tourTitle   String?
+  message     String   @db.Text
+  
+  adults      Int?
+  children    Int?
+  startDate   DateTime?
+  
+  status      String   @default("pending") // pending, contacted, completed
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("booking_inquiries")
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Testimonial {
+  id    String @id @default(cuid())
+  name  String
+  image String?
+  text  String @db.Text
+  rating Int    @default(5) // 1-5 stars
+  tour  String? // Tour title or related tour
+  
+  approved Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model ContactMessage {
+  id      String   @id @default(cuid())
+  name    String
+  email   String
+  subject String
+  message String   @db.Text
+  
+  status  String   @default("unread") // unread, read, replied
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_messages")
+  @@index([status])
+}
