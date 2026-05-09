@@ -1,18 +1,27 @@
 import { randomUUID } from "crypto";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Strict remote storage: require Supabase env vars
-const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const SUPABASE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET!;
+// Lazily initialize Supabase admin client so module import doesn't
+// throw during build-time when env vars are intentionally absent.
+let supabaseAdmin: SupabaseClient | null = null;
+let SUPABASE_BUCKET: string | undefined;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_BUCKET) {
-  throw new Error(
-    "Supabase storage is not configured. Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_BUCKET."
-  );
+function ensureSupabaseConfigured() {
+  if (supabaseAdmin && SUPABASE_BUCKET) return { supabaseAdmin, SUPABASE_BUCKET };
+
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  SUPABASE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
+
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_BUCKET) {
+    throw new Error(
+      "Supabase storage is not configured. Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_BUCKET."
+    );
+  }
+
+  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  return { supabaseAdmin, SUPABASE_BUCKET };
 }
-
-const supabaseAdmin: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const dataUrlPattern = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/;
 const MAX_DATA_URL_SIZE = 10 * 1024 * 1024; // 10MB limit for data URLs
@@ -85,16 +94,17 @@ export async function persistImageReference(
       throw new Error("Image data appears to be corrupted or too small.");
     }
 
+    const { supabaseAdmin: client, SUPABASE_BUCKET: bucket } = ensureSupabaseConfigured();
     const objectPath = `${prefix}/${Date.now()}-${fileName}`;
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from(SUPABASE_BUCKET)
+    const { error: uploadError } = await client.storage
+      .from(bucket)
       .upload(objectPath, buffer, { contentType: mimeType, upsert: false });
 
     if (uploadError) {
       throw new Error(`Supabase upload failed: ${uploadError.message}`);
     }
 
-    const { data: publicUrlData } = supabaseAdmin.storage.from(SUPABASE_BUCKET).getPublicUrl(objectPath);
+    const { data: publicUrlData } = client.storage.from(bucket).getPublicUrl(objectPath);
     const publicUrl = publicUrlData?.publicUrl || null;
     if (!publicUrl) throw new Error("Failed to obtain public URL from Supabase storage.");
 
