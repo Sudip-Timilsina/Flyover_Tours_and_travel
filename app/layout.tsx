@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { generateSEOMetadata } from "@/lib/seo";
 import { LayoutWrapper } from "@/components/common/LayoutWrapper";
+import "./globals.css";
 
 
 const baseMetadata = generateSEOMetadata({
