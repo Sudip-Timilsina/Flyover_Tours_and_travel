@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { SITE_CONFIG } from "@/lib/constants";
 
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [tours, destinations, blogPosts] = await Promise.all([
     db.tour.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } }),

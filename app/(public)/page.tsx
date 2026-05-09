@@ -6,7 +6,7 @@ import { cache } from "react";
 import { ArrowRight, Award, Compass, MapPinned, ShieldCheck, Sparkles } from "lucide-react";
 import { getSiteSettings } from "@/lib/site-settings";
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 const getHomepageData = cache(async function getHomepageData() {
   try {

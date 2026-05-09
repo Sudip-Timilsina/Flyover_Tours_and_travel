@@ -5,6 +5,8 @@ import Link from "next/link";
 import { cache } from "react";
 import { Compass, Sparkles } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = generateSEOMetadata({
   title: "Tour Packages in Nepal",
   description: "Explore all available tour packages in Nepal. Trekking, cultural tours, adventure packages, and more.",

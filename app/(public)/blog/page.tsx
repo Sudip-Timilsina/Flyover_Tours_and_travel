@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { generateSEOMetadata } from "@/lib/seo";
 import Image from "next/image";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = generateSEOMetadata({
   title: "Travel Blog - Flyover Car Rental Tips",
   description: "Read our latest blog posts about Nepal travel, trekking guides, and tourism tips",

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { cache } from "react";
 import { ArrowRight, Compass, MapPinned } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = generateSEOMetadata({
   title: "Destinations in Nepal",
   description: "Explore popular destinations in Nepal",
