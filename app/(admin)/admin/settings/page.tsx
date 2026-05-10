@@ -7,6 +7,25 @@ import { ImageUploadField } from "@/components/common/ImageUploadField";
 import { Sparkles, LayoutDashboard, Image as ImageIcon, Mail, Phone, MapPin } from "lucide-react";
 import { DEFAULT_SITE_SETTINGS, type SiteSettingsValue } from "@/lib/site-settings";
 
+async function parseJsonSafely(response: Response) {
+  const contentType = response.headers.get("content-type") || "";
+  const text = await response.text();
+
+  if (!text) {
+    return null;
+  }
+
+  if (!contentType.includes("application/json")) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 export default function SiteSettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -17,7 +36,16 @@ export default function SiteSettingsPage() {
 
   useEffect(() => {
     fetch("/api/admin/site-settings")
-      .then((response) => response.json())
+      .then(async (response) => {
+        const data = await parseJsonSafely(response);
+
+        if (!response.ok) {
+          const message = (data as any)?.error || "Failed to load site settings";
+          throw new Error(message);
+        }
+
+        return data;
+      })
       .then((data) => {
         if (data) {
           setFormData({
@@ -28,7 +56,7 @@ export default function SiteSettingsPage() {
           });
         }
       })
-      .catch(() => setError("Failed to load site settings"))
+        .catch((err: any) => setError(err?.message || "Failed to load site settings"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -53,8 +81,8 @@ export default function SiteSettingsPage() {
       });
 
       if (!response.ok) {
-        const payload = await response.json();
-        throw new Error(payload.error || "Failed to save site settings");
+        const payload = await parseJsonSafely(response);
+        throw new Error((payload as any)?.error || "Failed to save site settings");
       }
 
       setSuccess("Site settings saved successfully.");
