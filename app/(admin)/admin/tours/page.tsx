@@ -18,14 +18,31 @@ interface Tour {
 export default function AdminToursPage() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/tours")
-      .then((res) => res.json())
-      .then((data) => {
+    const loadTours = async () => {
+      try {
+        const response = await fetch("/api/admin/tours");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Failed to load tours");
+        }
+
+        if (!Array.isArray(data)) {
+          throw new Error("Unexpected tours response");
+        }
+
         setTours(data);
+      } catch (err: any) {
+        setError(err?.message || "Failed to load tours");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadTours();
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -36,6 +53,10 @@ export default function AdminToursPage() {
   };
 
   if (loading) return <div className="glass-card p-8">Loading tours...</div>;
+
+  if (error) {
+    return <div className="glass-card p-8 text-rose-700">{error}</div>;
+  }
 
   return (
     <div className="space-y-8">
