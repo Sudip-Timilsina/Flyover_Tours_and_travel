@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/lib/validations";
 
@@ -7,26 +6,31 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await loginSchema.parseAsync(await request.json());
 
-    // Verify admin credentials
-    const admin = await db.admin.findUnique({
-      where: { email },
-    });
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    if (!admin) {
+    if (!adminEmail || !adminPassword) {
+      return NextResponse.json({ error: "Admin credentials are not configured" }, { status: 500 });
+    }
+
+    if (email !== adminEmail) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
+    const isPasswordValid = adminPassword.startsWith("$2")
+      ? await bcrypt.compare(password, adminPassword)
+      : password === adminPassword;
+
     if (!isPasswordValid) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     const response = NextResponse.json({
       success: true,
-      admin: { id: admin.id, email: admin.email },
+      admin: { id: adminEmail, email: adminEmail },
     });
 
-    response.cookies.set("auth", admin.id, {
+    response.cookies.set("auth", adminEmail, {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
