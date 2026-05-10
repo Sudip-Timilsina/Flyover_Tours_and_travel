@@ -4,6 +4,8 @@ import { createTourSchema } from "@/lib/validations";
 import { createSlug } from "@/utils/helpers";
 import { persistImageReference } from "@/lib/image-storage";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const tours = await db.tour.findMany({

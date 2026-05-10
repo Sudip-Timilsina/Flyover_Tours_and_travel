@@ -4,6 +4,8 @@ import { siteSettingsSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { persistImageReference } from "@/lib/image-storage";
 
+export const dynamic = 'force-dynamic';
+
 const singletonId = "singleton";
 
 export async function GET() {

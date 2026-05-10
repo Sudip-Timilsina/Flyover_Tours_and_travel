@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { persistImageReference } from "@/lib/image-storage";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const posts = await db.blogPost.findMany({
