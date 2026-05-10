@@ -99,7 +99,7 @@ export function Footer() {
         <div className="my-10 h-px bg-white/10" />
 
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-slate-400 md:flex-row">
-          <p>&copy; 2024 Flyover Car Rental. All rights reserved.</p>
+          <p>&copy; 2026 Flyover Car Rental. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4">
             <a href="#" className="hover:text-white">
               Privacy Policy
