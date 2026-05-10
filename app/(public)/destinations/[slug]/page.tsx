@@ -7,6 +7,8 @@ interface Params {
   params: { slug: string };
 }
 
+export const dynamic = 'force-dynamic';
+
 async function getDestination(slug: string) {
   try {
     return await db.destination.findUnique({

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TourBookingForm } from "@/components/public/TourBookingForm";
 
+export const dynamic = 'force-dynamic';
+
 interface Params {
   params: { slug: string };
 }
