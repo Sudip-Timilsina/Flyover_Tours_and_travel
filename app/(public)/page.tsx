@@ -82,19 +82,6 @@ export default async function HomePage() {
                 {settings.heroSecondaryCtaLabel}
               </Link>
             </div>
-
-            <div className="grid gap-4 pt-4 sm:grid-cols-3">
-              {[
-                { value: "50+", label: "Curated experiences" },
-                { value: "24/7", label: "Concierge support" },
-                { value: "98%", label: "Guest satisfaction" },
-              ].map((item) => (
-                <div key={item.label} className="glass-card px-5 py-4 text-white/95 backdrop-blur-md">
-                  <p className="text-3xl font-black text-accent-500">{item.value}</p>
-                  <p className="mt-1 text-sm text-slate-500">{item.label}</p>
-                </div>
-              ))}
-              </div>
           </div>
         </div>
       </section>
